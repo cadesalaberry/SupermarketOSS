@@ -3,6 +3,7 @@ package test;
 import java.lang.reflect.Field;
 
 import javax.swing.JButton;
+import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 
 import org.easymock.EasyMock;
@@ -31,6 +32,12 @@ public class TestCounterFrame {
 			connectButtonField.setAccessible(true);
 			JToggleButton connectButton = (JToggleButton)connectButtonField.get(counter);
 			connectButton.doClick();
+			
+			Field messageField = CounterFrame.class.getDeclaredField("messageLine");
+			messageField.setAccessible(true);
+			JTextField messageLine = (JTextField)messageField.get(counter);
+			System.out.println("Message Line: " + messageLine.getText());
+			//assertEquals(messageLine.getText(), "Connection successfull, welcome employee");
 		}
 		catch (NoSuchFieldException e) {
 			// TODO Auto-generated catch block
