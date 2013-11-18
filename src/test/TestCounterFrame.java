@@ -10,8 +10,8 @@ import org.easymock.EasyMock;
 
 import Counter.MarketProxy;
 import CounterUI.CounterFrame;
-
 import static org.junit.Assert.*;
+
 import org.junit.Test;
 
 public class TestCounterFrame {
@@ -31,18 +31,9 @@ public class TestCounterFrame {
 			EasyMock.expect(marketProxy.connect(1, "")).andReturn("employee");
 			EasyMock.replay(marketProxy);
 			
-			Field connectButtonField = CounterFrame.class.getDeclaredField("ConnectButton");
-			connectButtonField.setAccessible(true);
-			JToggleButton connectButton = (JToggleButton)connectButtonField.get(counter);
-			connectButton.doClick();
+			String message = clickConnect(counter);
 			
-			Field messageField = CounterFrame.class.getDeclaredField("messageLine");
-			messageField.setAccessible(true);
-			JTextField messageLine = (JTextField)messageField.get(counter);
-			
-			assertEquals(messageLine.getText(), "Connection successfull, welcome employee");
-			
-			
+			assertEquals(message, "Connection successfull, welcome employee");
 		}
 		catch (Exception e) {
 			e.printStackTrace();
@@ -62,16 +53,9 @@ public class TestCounterFrame {
 			EasyMock.expect(marketProxy.connect(12, "")).andReturn("employee");
 			EasyMock.replay(marketProxy);
 			
-			Field connectButtonField = CounterFrame.class.getDeclaredField("ConnectButton");
-			connectButtonField.setAccessible(true);
-			JToggleButton connectButton = (JToggleButton)connectButtonField.get(counter);
-			connectButton.doClick();
+			String message = clickConnect(counter);
 			
-			Field messageField = CounterFrame.class.getDeclaredField("messageLine");
-			messageField.setAccessible(true);
-			JTextField messageLine = (JTextField)messageField.get(counter);
-			
-			assertEquals(messageLine.getText(), "Wrong code or password.");
+			assertEquals(message, "Wrong code or password.");
 			
 			Field employeeCodeField = CounterFrame.class.getDeclaredField("employeeName");
 			employeeCodeField.setAccessible(true);
@@ -79,9 +63,9 @@ public class TestCounterFrame {
 			
 			employeeCode.setText("12");
 			
-			connectButton.doClick();
+			message = clickConnect(counter);
 			
-			assertEquals(messageLine.getText(), "Connection successfull, welcome employee");
+			assertEquals(message, "Connection successfull, welcome employee");
 			
 		}
 		catch (Exception e) {
@@ -103,24 +87,29 @@ public class TestCounterFrame {
 			EasyMock.expect(marketProxy.connect(1, "")).andReturn("employee");
 			EasyMock.replay(marketProxy);
 			
-			Field connectButtonField = CounterFrame.class.getDeclaredField("ConnectButton");
-			connectButtonField.setAccessible(true);
-			JToggleButton connectButton = (JToggleButton)connectButtonField.get(counter);
-			connectButton.doClick();
+			String message = clickConnect(counter);
 			
-			Field messageField = CounterFrame.class.getDeclaredField("messageLine");
-			messageField.setAccessible(true);
-			JTextField messageLine = (JTextField)messageField.get(counter);
+			assertEquals(message, "Connection successfull, welcome employee");
 			
-			assertEquals(messageLine.getText(), "Connection successfull, welcome employee");
+			message = clickConnect(counter);
 			
-			connectButton.doClick();
-			
-			assertEquals(messageLine.getText(), "Disconnection successfull");
+			assertEquals(message, "Disconnection successfull");
 		}
 		catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
+	public String clickConnect(CounterFrame counter) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+		Field connectButtonField = CounterFrame.class.getDeclaredField("ConnectButton");
+		connectButtonField.setAccessible(true);
+		JToggleButton connectButton = (JToggleButton)connectButtonField.get(counter);
+		connectButton.doClick();
+		
+		Field messageField = CounterFrame.class.getDeclaredField("messageLine");
+		messageField.setAccessible(true);
+		JTextField messageLine = (JTextField)messageField.get(counter);
+		
+		return messageLine.getText();
+	}
 }
