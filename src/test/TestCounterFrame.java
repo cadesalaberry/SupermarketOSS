@@ -11,22 +11,25 @@ import org.easymock.EasyMock;
 import Counter.MarketProxy;
 import CounterUI.CounterFrame;
 
-public class TestCounterFrame {
+import static org.junit.Assert.*;
+import org.junit.Test;
 
-	public static void main(String[] args) {
+public class TestCounterFrame {
+	private boolean visibility = true;
+
+	
+	/**
+	 * TC6
+	 */
+	@Test
+	public void connectSucessFirst() {
 		MarketProxy marketProxy = EasyMock.createNiceMock(MarketProxy.class);
 		CounterFrame counter = new CounterFrame(marketProxy);
-		counter.setVisible(true);
+		counter.setVisible(visibility);
 		
 		try {
 			EasyMock.expect(marketProxy.connect(1, "")).andReturn("employee");
 			EasyMock.replay(marketProxy);
-			
-			Field jButtonField = CounterFrame.class.getDeclaredField("bt5");
-			jButtonField.setAccessible(true);
-			JButton bt5 = (JButton)jButtonField.get(counter);
-			bt5.doClick();
-			//bt5.doClick();
 			
 			Field connectButtonField = CounterFrame.class.getDeclaredField("ConnectButton");
 			connectButtonField.setAccessible(true);
@@ -36,25 +39,88 @@ public class TestCounterFrame {
 			Field messageField = CounterFrame.class.getDeclaredField("messageLine");
 			messageField.setAccessible(true);
 			JTextField messageLine = (JTextField)messageField.get(counter);
-			System.out.println("Message Line: " + messageLine.getText());
-			//assertEquals(messageLine.getText(), "Connection successfull, welcome employee");
-		}
-		catch (NoSuchFieldException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		catch (SecurityException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			
+			assertEquals(messageLine.getText(), "Connection successfull, welcome employee");
+			
+			
 		}
 		catch (Exception e) {
 			e.printStackTrace();
 		}
-		
 	}
 	
-//	public static void tc1() {
-//		bt1.doClick();
-//		ConnectButton
-//	}
+	/**
+	 * TC7
+	 */
+	@Test
+	public void connectSucessSecond() {
+		MarketProxy marketProxy = EasyMock.createNiceMock(MarketProxy.class);
+		CounterFrame counter = new CounterFrame(marketProxy);
+		counter.setVisible(visibility);
+		
+		try {
+			EasyMock.expect(marketProxy.connect(12, "")).andReturn("employee");
+			EasyMock.replay(marketProxy);
+			
+			Field connectButtonField = CounterFrame.class.getDeclaredField("ConnectButton");
+			connectButtonField.setAccessible(true);
+			JToggleButton connectButton = (JToggleButton)connectButtonField.get(counter);
+			connectButton.doClick();
+			
+			Field messageField = CounterFrame.class.getDeclaredField("messageLine");
+			messageField.setAccessible(true);
+			JTextField messageLine = (JTextField)messageField.get(counter);
+			
+			assertEquals(messageLine.getText(), "Wrong code or password.");
+			
+			Field employeeCodeField = CounterFrame.class.getDeclaredField("employeeName");
+			employeeCodeField.setAccessible(true);
+			JTextField employeeCode = (JTextField)employeeCodeField.get(counter);
+			
+			employeeCode.setText("12");
+			
+			connectButton.doClick();
+			
+			assertEquals(messageLine.getText(), "Connection successfull, welcome employee");
+			
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	
+	/**
+	 * TC8
+	 */
+	@Test
+	public void disconnect() {
+		MarketProxy marketProxy = EasyMock.createNiceMock(MarketProxy.class);
+		CounterFrame counter = new CounterFrame(marketProxy);
+		counter.setVisible(visibility);
+		
+		try {
+			EasyMock.expect(marketProxy.connect(1, "")).andReturn("employee");
+			EasyMock.replay(marketProxy);
+			
+			Field connectButtonField = CounterFrame.class.getDeclaredField("ConnectButton");
+			connectButtonField.setAccessible(true);
+			JToggleButton connectButton = (JToggleButton)connectButtonField.get(counter);
+			connectButton.doClick();
+			
+			Field messageField = CounterFrame.class.getDeclaredField("messageLine");
+			messageField.setAccessible(true);
+			JTextField messageLine = (JTextField)messageField.get(counter);
+			
+			assertEquals(messageLine.getText(), "Connection successfull, welcome employee");
+			
+			connectButton.doClick();
+			
+			assertEquals(messageLine.getText(), "Disconnection successfull");
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
 }
