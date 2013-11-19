@@ -23,10 +23,8 @@ import MarketDB.Employee;
 import MarketDB.Item;
 import MarketDB.PersistentDB;
 
-public class CounterUITest {
+public class IntegrationTest {
 	private static boolean visibility = false;
-	
-	
 	
 	/**
 	 * TC1

@@ -1,20 +1,19 @@
 package test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.lang.reflect.Field;
 
 import javax.swing.AbstractButton;
-import javax.swing.JButton;
-import javax.swing.JTextField;
-import javax.swing.JToggleButton;
 import javax.swing.text.JTextComponent;
 
 import org.easymock.EasyMock;
+import org.junit.Test;
 
 import Counter.MarketProxy;
 import CounterUI.CounterFrame;
-import static org.junit.Assert.*;
-
-import org.junit.Test;
 
 public class CounterFrameTest {
 	private static boolean visibility = false;
