@@ -1,6 +1,8 @@
 package test;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 
 import javax.swing.AbstractButton;
 import javax.swing.JButton;
@@ -11,7 +13,14 @@ import javax.swing.text.JTextComponent;
 import org.easymock.EasyMock;
 
 import Counter.MarketProxy;
+import Counter.SocketProxy;
 import CounterUI.CounterFrame;
+import Market.BasicServer;
+import Market.MarketServer;
+import MarketDB.PersistentDB;
+import MarketDB.Employee;
+import MarketDB.Customer;
+import MarketDB.Item;
 import static org.junit.Assert.*;
 
 import org.junit.Test;
@@ -19,22 +28,29 @@ import org.junit.Test;
 public class CounterUITest {
 	private static boolean visibility = false;
 	
+	
+	
 	/**
 	 * TC1
 	 */
 	@Test
 	public void normalAcquisition() {
-		MarketProxy marketProxy = EasyMock.createNiceMock(MarketProxy.class);
-		CounterFrame counter = new CounterFrame(marketProxy);
+		CounterFrame counter = new CounterFrame(new SocketProxy());
+		MarketServer market = new MarketServer();
+		(new Thread(market)).start();
+		PersistentDB persistentDB = EasyMock.createNiceMock(PersistentDB.class);
+		BasicServer server = new BasicServer(persistentDB);
+
 		counter.setVisible(visibility);
 		
 		try {
-			EasyMock.expect(marketProxy.connect(1, "")).andReturn("employee");
-			EasyMock.expect(marketProxy.getCustomer(999)).andReturn("badassName");
-			EasyMock.expect(marketProxy.getPrice(666)).andReturn(69.0);
-			EasyMock.expect(marketProxy.getName(666)).andReturn("deviledEggs");
 			
-			EasyMock.replay(marketProxy);
+			EasyMock.expect(persistentDB.getEmployee(1)).andReturn(createEmployee(1, "employee", "pass"));
+			EasyMock.expect(persistentDB.getCustomer(999)).andReturn(createCustomer(999, "badassName"));
+			EasyMock.expect(persistentDB.getItem(666)).andReturn(createItem(69, "deviledEggs", 69.0, 2));
+			EasyMock.expect(persistentDB.startTransaction(999, 1)).andReturn((long) 45);
+			
+			EasyMock.replay(persistentDB);
 			
 			click(counter, "ConnectButton");
 			
@@ -411,4 +427,30 @@ public class CounterUITest {
 		text.setText(textToSet);
 	}
 	
+	public static Employee createEmployee(long a, String b, String c) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+		Class[] employeeArguments = new Class[] { Long.class, String.class, String.class };
+		
+		Object[] arguments = new Object[] {a, b, c};
+		Constructor EmployeeArgsConstructor = Employee.class.getConstructor(employeeArguments);
+		
+		return (Employee) EmployeeArgsConstructor.newInstance(arguments);
+	}
+	
+	public static Customer createCustomer(long a, String b) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+		Class[] customerArguments = new Class[] { Long.class, String.class };
+		
+		Object[] arguments = new Object[] {a, b};
+		Constructor CustomerArgsConstructor = Customer.class.getConstructor(customerArguments);
+		
+		return (Customer) CustomerArgsConstructor.newInstance(arguments);
+	}
+	
+	public static Item createItem(long a, String b, double c, long d) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+		Class[] itemArguments = new Class[] { Long.class, String.class, Double.class, Long.class};
+		
+		Object[] arguments = new Object[] {a, b, c, d};
+		Constructor ItemArgsConstructor = Item.class.getConstructor(itemArguments);
+		
+		return (Item) ItemArgsConstructor.newInstance(arguments);
+	}
 }
